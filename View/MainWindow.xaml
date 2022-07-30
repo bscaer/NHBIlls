@@ -1,0 +1,133 @@
+﻿<Window x:Class="Legiscan.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Legiscan.ViewModel" 
+        mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="14"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Title="{Binding WindowTitle}" 
+        Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="showHideBillsColumn" TargetType="{x:Type ColumnDefinition}">
+            <Style.Setters>
+                <Setter Property="Width" Value="*"/>
+            </Style.Setters>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ShowBills}" Value="False">
+                    <DataTrigger.Setters>
+                        <Setter Property="Width" Value="0"/>
+                        <Setter Property="MaxWidth" Value="0"/>
+                    </DataTrigger.Setters>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="showHideSplitterColumn" TargetType="{x:Type ColumnDefinition}">
+            <Style.Setters>
+                <Setter Property="Width" Value="auto"/>
+            </Style.Setters>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ShowBills}" Value="False">
+                    <DataTrigger.Setters>
+                        <Setter Property="Width" Value="0"/>
+                        <Setter Property="MaxWidth" Value="0"/>
+                    </DataTrigger.Setters>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="showHideSplitter" TargetType="{x:Type GridSplitter}">
+            <Style.Setters>
+                <Setter Property="Visibility" Value="Visible"/>
+            </Style.Setters>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ShowBills}" Value="False">
+                    <DataTrigger.Setters>
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger.Setters>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="billTableTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="25"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding Path=IsSelected, Mode=TwoWay}"/>
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding Number}"/>
+                <TextBlock Grid.Column="2" Text="{Binding Title}"/>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+    <Window.DataContext>
+        <local:MainViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <!--<RowDefinition Height="Auto"/>-->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!--<Menu Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="Fetch Bills" Command="{Binding FetchCommand}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="Download"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Hide Bills" Command="{Binding HideCommand}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="Hide"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>-->
+        <ToolBar Grid.Row="0" Margin="2" ToolBarTray.IsLocked="True" ToolBar.OverflowMode="Never">
+            <Button ToolTip="Fetch the List of Bills" Command="{Binding FetchCommand}">
+                <materialDesign:PackIcon Kind="Download"/>
+            </Button>
+            <Button ToolTip="Hide the List of Bills" Command="{Binding HideCommand}">
+                <materialDesign:PackIcon Kind="Hide"/>
+            </Button>
+            <TextBox Width="100" Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <!--<Button ToolTip="Filter the List of Bills" Command="{Binding FilterCommand}">
+                <materialDesign:PackIcon Kind="Check"/>
+            </Button>-->
+        </ToolBar>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Style="{StaticResource showHideBillsColumn}"/>
+                <ColumnDefinition Style="{StaticResource showHideSplitterColumn}"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ListView 
+                Grid.Column="0" 
+                ItemsSource="{Binding Bills}"
+                ItemTemplate="{StaticResource billTableTemplate}">
+            </ListView>
+            <ListView 
+                Grid.Column="2" 
+                ItemsSource="{Binding SelectedBills}"
+                ItemTemplate="{StaticResource billTableTemplate}">
+            </ListView>
+            <GridSplitter 
+                Grid.Column="1"
+                HorizontalAlignment="Center"   
+                VerticalAlignment="Stretch"      
+                Width="5" 
+                Background="Silver"
+                Style="{StaticResource showHideSplitter}">
+            </GridSplitter>
+        </Grid>
+    </Grid>
+</Window>
